@@ -1,0 +1,9 @@
+$fontStack:    Helvetica, sans-serif;
+$primaryColor: #fff;
+
+body {
+  width: 100px;
+  height: 100px;
+  font-family: $fontStack;
+  background: $primaryColor;
+}

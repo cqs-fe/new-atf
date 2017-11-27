@@ -13,6 +13,19 @@
     <topbar></topbar>
     <sidebar></sidebar>
     <main class="main">
+      <ol class="breadcrumb">
+        <li><a href="#">接口管理</a></li>
+        <li class="active">xml与json解析</li>
+      </ol>
+        <!-- Nav tabs -->
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">JSON</a></li>
+        <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">XML</a></li>
+      </ul>
+      <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="home">json</div>
+          <div role="tabpanel" class="tab-pane" id="profile"><xml-parser></xml-parser></div>
+        </div>
     </main>
     <footerbar></footerbar>
   </div>

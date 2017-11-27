@@ -47,9 +47,6 @@ module.exports = {
           }]
         })
       }, {
-        test: /\.(tpl)$/,
-        loader: 'html-loader'
-      }, {
         test: /\.(png|jpe?g|gif)$/,
         use: [
           {

@@ -6,5 +6,8 @@ import Footerbar from '@/components/footerbar/index.vue';
 
 new Vue({
   el: '#root',
+  data: {
+    activeTab: 'json'
+  },
   components: { Sidebar, Topbar, Footerbar }
 })

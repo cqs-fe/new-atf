@@ -16,6 +16,7 @@ export default {
 <style scoped>
   .copy-right {
     height: 50px;
+    clear: both;
   }
 </style>
 

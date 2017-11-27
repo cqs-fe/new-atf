@@ -1,17 +1,21 @@
 /*sidebar navigation*/
 
-#sidebar {
-  width: 180px;
-  height: calc(100% - 110px);
+#sidebar-wrapper {
+  overflow: auto;
+  /* float: left; */
   position: fixed;
   top: 60px;
+}
+#sidebar {
+  width: 180px;
   background: #2a3542;
+  height: calc(100vh - 110px);
   z-index: 10;
   overflow: auto;
 }
 
 ul.sidebar-menu , ul.sidebar-menu li ul.sub{
-  margin: -2px 0 0;
+  margin: 0;
   padding: 0;
 }
 
@@ -20,20 +24,11 @@ ul.sidebar-menu {
 }
 
 #sidebar > ul  li .sub {
-  display: block;
-  overflow: hidden;
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  -ms-transition: all 0.5s ease;
-  transition: all 0.5s ease;
-  /* height: 0; */
+  transition: 0.3s height ease-in-out, 0.3s padding-top ease-in-out, 0.3s padding-bottom ease-in-out;
 }
-#sidebar > ul  li.active-sub .sub{
-  /* height: 35px; */
-}
-#sidebar > ul li.active .sub, #sidebar > ul li:hover .sub, #sidebar > ul li .sub li a {
+ #sidebar > ul li > a {
   display: block;
+  cursor: pointer;
 }
 
 ul.sidebar-menu li .sub li{

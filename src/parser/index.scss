@@ -1,0 +1,12 @@
+.main {
+  display: flex;
+  flex-direction: column;
+}
+.tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+.tab-pane {
+  flex: 1;
+}

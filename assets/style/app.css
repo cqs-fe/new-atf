@@ -1,6 +1,7 @@
 /* 公共的样式库 */
 html, body {
   min-height: 100vh;
+  min-width: 1100px;
 }
 .root {
   overflow: hidden;

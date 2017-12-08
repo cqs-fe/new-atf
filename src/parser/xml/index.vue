@@ -4,7 +4,28 @@ export default {
   data() {
     var me = this;
     return {
-      xmlCode: "",
+      xmlCode: `<main class="main-wrap">
+    <div class="panel panel-default  ztree-wrapper">
+        <div class="panel-heading">xml结构</div>
+        <div class="panel-body ">
+            <div id="ztree" class="ztree"></div>
+        </div>
+    </div>
+    <div class="xml-wrapper">
+        <div class="panel panel-default  edit-node">
+            <div class="panel-heading">xml文本</div>
+            <div class="panel-body ">
+                <textarea name="" class="xml-textarea" v-model="xmlCode"></textarea>
+            </div>
+        </div>
+        <div class="panel panel-default  edit-node">
+            <div class="panel-heading">节点属性</div>
+            <div class="panel-body ">
+                <div id="edit-node" class=""></div>
+            </div>
+        </div>
+    </div>
+</main>`,
       xmlObject: null,
       zTreeObj: null,
       zTreeSetting: {
@@ -16,18 +37,23 @@ export default {
         },
         callback: {
           onRemove: this.onRemove,
-          onRename: this.onRename
+          onRename: this.onRename,
+          onClick: this.onzTreeClick
         }
       },
-      zTreeNodes: []
+      zTreeNodes: [],
+      selNodeAttrs: [], // 选中的节点的属性
+      tId: null, // 选中的节点ID
     };
   },
   created() {
-    this.zTreeObj = $.fn.zTree.init(
-      $("#ztree"),
-      this.zTreeSetting,
-      this.zTreeNodes
-    );
+    var me = this;
+    document.addEventListener('DOMContentLoaded', function() {
+      me.format();
+    })
+  },
+  computed: function() {
+    selNodeAttrs: 
   },
   watch: {},
   methods: {
@@ -56,6 +82,14 @@ export default {
       }
       return a;
 
+      /**
+       * 生成的节点：
+       {
+          name: string 节点名称
+          attrbutes: { Array[{ name: attrName, value: attrValue }] }  节点的属性集合
+          children: { Array[{node}] }  节点的子节点
+       }
+       */
       function getNodes(domNode) {
         let node = { open: true };
         node.name = domNode.nodeName;
@@ -102,14 +136,19 @@ export default {
     onRemove: function(event, treeId, treeNode) {
       let rootNode = this.zTreeObj.getNodes()[0];
       this.xmlCode = rootNode
-        ? $.trim(vkbeautify.xml(this.obj2Xml(rootNode)))
+        ? $.trim(vkbeautify.xml($.trim(this.obj2Xml(rootNode))))
         : "";
     },
     onRename: function(event, treeId, treeNode) {
       let rootNode = this.zTreeObj.getNodes()[0];
       this.xmlCode = rootNode
-        ? $.trim(vkbeautify.xml(this.obj2Xml(rootNode)))
+        ? $.trim(vkbeautify.xml($.trim(this.obj2Xml(rootNode))))
         : "";
+    },
+    // 点击节点后的回调
+    onzTreeClick: function(event, treeId, treeNode) {
+      // this.selNodeAttrs = treeNode.attributes;
+      this.tId = treeNode.tId;
     }
   }
 };
@@ -123,46 +162,68 @@ export default {
 				<div id="ztree" class="ztree"></div>
 			</div>
 		</div>
-		<div class="panel panel-default  edit-node">
-			<div class="panel-heading">节点属性</div>
-			<div class="panel-body ">
-				<div id="edit-node" class=""></div>
-			</div>
-		</div>
-		<div class="panel panel-default  edit-node">
-			<div class="panel-heading">xml文本</div>
-			<div class="panel-body ">
-				<textarea name="" class="xml-textarea" @change="format" v-model="xmlCode"></textarea>
-			</div>
-		</div>
+    <div class="xml-wrapper">
+      <div class="panel panel-default  edit-node">
+        <div class="panel-heading">xml文本</div>
+        <div class="panel-body ">
+          <textarea name="" class="xml-textarea" @change="format" v-model="xmlCode"></textarea>
+        </div>
+      </div>
+      <div class="panel panel-default  edit-node">
+        <div class="panel-heading">节点属性</div>
+        <div class="panel-body ">
+          <div id="edit-node" class="">
+            <table class="table table-bordered table-condensed attr-table">
+              <tr><th>属性名</th><th>属性值</th></tr>
+              <tbody>
+                <tr v-for="(attr, index) of selNodeAttrs" :key="index">
+                  <td contenteditable="true">{{attr.name}}</td>
+                  <td contenteditable="true">{{attr.value}}</td>
+                </tr>
+                <tr><td colspan="2" class="tar"><button type="button" class="fr btn btn-sm btn-primary btn-save-attr">保存</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
 	</main>
 </template>
-<style language="scss" scoped >
+<style lang="scss"  scoped >
+.fr {
+  float: right;
+}
+.tar {
+  text-align: right;
+}
+.main {
+  min-height: 100vh;
+}
 .main-wrap {
   height: 100%;
   overflow: hidden;
   display: flex;
 }
-.left,
-.right {
-  float: left;
-  width: 49%;
-  margin: 0;
-  height: 100%;
-  overflow: auto;
-}
-.left {
-  border-right: 1px solid #ddd;
-  margin-right: 1%;
-  padding: 0 1% 0 0;
-  display: flex;
-}
 .ztree-wrapper {
   flex: 1;
   overflow: auto;
+  height: calc(100vh - 120px);
 }
 .edit-node {
-  flex: 1;
+  flex: 0 0 50% ;
+}
+.xml-wrapper {
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+}
+.panel {
+  margin-bottom: 0;
+}
+.panel-body {
+  height: 84%;
+  padding: 5px;
 }
 .xml-textarea {
   width: 100%;
@@ -170,4 +231,11 @@ export default {
   border: none;
   resize: none;
 }
+.attr-table {
+  width: 80%;
+  .btn-save-attr {
+    margin-right: 20px;
+  }
+}
+
 </style>

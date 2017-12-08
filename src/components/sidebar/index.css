@@ -3,6 +3,7 @@
 #sidebar-wrapper {
   overflow: auto;
   /* float: left; */
+  z-index: 10;
   position: fixed;
   top: 60px;
 }
@@ -10,7 +11,6 @@
   width: 180px;
   background: #2a3542;
   height: calc(100vh - 110px);
-  z-index: 10;
   overflow: auto;
 }
 

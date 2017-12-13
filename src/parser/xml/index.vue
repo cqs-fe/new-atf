@@ -30,7 +30,9 @@ export default {
       zTreeObj: null,
       zTreeSetting: {
         view: {
-          showIcon: false
+          showIcon: false,
+          addHoverDom: this.addHoverDom,
+          removeHoverDom: this.removeHoverDom
         },
         edit: {
           enable: true
@@ -42,7 +44,7 @@ export default {
         }
       },
       zTreeNodes: [],
-      selNodeAttrs: [], // 选中的节点的属性
+      // selNodeAttrs: [], // 选中的节点的属性
       tId: null, // 选中的节点ID
     };
   },
@@ -52,10 +54,20 @@ export default {
       me.format();
     })
   },
-  computed: function() {
-    selNodeAttrs: 
+  computed: {
+    selNodeAttrs: function() {
+      if (this.zTreeObj) {
+        let node = this.zTreeObj.getNodeByTId(this.tId);
+        return node ? node.attributes : [];
+      } else {
+        return [];
+      }
+    }
   },
-  watch: {},
+  directives: {
+  },
+  watch: {
+  },
   methods: {
     format: function() {
       this.xmlCode = vkbeautify.xml(this.xmlCode);
@@ -74,6 +86,10 @@ export default {
         this.zTreeSetting,
         this.dom2Obj(this.xmlObject)
       );
+      let node = this.zTreeObj.getNodeByTId(this.tId);
+      if(node) {
+        this.zTreeObj.selectNode(node);
+      }
     },
     dom2Obj: function(dom) {
       var a = [];
@@ -133,22 +149,58 @@ export default {
         )}</${obj.name}>`;
       }
     },
-    onRemove: function(event, treeId, treeNode) {
+    commonInRenameAndRemove: function() {
       let rootNode = this.zTreeObj.getNodes()[0];
       this.xmlCode = rootNode
         ? $.trim(vkbeautify.xml($.trim(this.obj2Xml(rootNode))))
         : "";
+      this.resetTId();
+    },
+    onRemove: function(event, treeId, treeNode) {
+      this.commonInRenameAndRemove();
     },
     onRename: function(event, treeId, treeNode) {
-      let rootNode = this.zTreeObj.getNodes()[0];
-      this.xmlCode = rootNode
-        ? $.trim(vkbeautify.xml($.trim(this.obj2Xml(rootNode))))
-        : "";
+      this.commonInRenameAndRemove();
+    },
+    resetTId: function() {
+      let node = this.zTreeObj ? this.zTreeObj.getNodeByTId(this.tId) : null;
+      if (!node) { this.tId = null; }
     },
     // 点击节点后的回调
     onzTreeClick: function(event, treeId, treeNode) {
-      // this.selNodeAttrs = treeNode.attributes;
       this.tId = treeNode.tId;
+    },
+    // 鼠标悬浮，显示增加节点按钮
+    addHoverDom: function(treeId, treeNode){
+      let me = this;
+      var sObj = $("#" + treeNode.tId + "_span");
+			if (treeNode.editNameFlag || $("#addBtn_"+treeNode.tId).length>0) return;
+			var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+				+ "' title='add node' onfocus='this.blur();' style='background-position: 100% -1px;'></span>";
+			sObj.after(addStr);
+			var btn = $("#addBtn_"+treeNode.tId);
+			if (btn) btn.bind("click", function(){
+        me.zTreeObj.addNodes(treeNode, -1, { name:"new node", attributes: [], children: [] });
+        me.commonInRenameAndRemove();
+				return false;
+			});
+    },
+    // 鼠标悬浮显示删除节点按钮
+    removeHoverDom: function (treeId, treeNode) {
+      $("#addBtn_"+treeNode.tId).unbind().remove();
+    },
+    // 保存节点属性
+    saveAttr: function () {
+      var attrs = [];
+      var trs = document.querySelectorAll('.tr-attr');
+      for (let tr of trs) {
+        attrs.push({
+          name: tr.querySelector('.attr-name').innerHTML,
+          value: tr.querySelector('.attr-value').innerHTML
+        });
+      }
+      this.zTreeObj.getNodeByTId(this.tId).attributes = attrs;
+      this.commonInRenameAndRemove();
     }
   }
 };
@@ -176,11 +228,11 @@ export default {
             <table class="table table-bordered table-condensed attr-table">
               <tr><th>属性名</th><th>属性值</th></tr>
               <tbody>
-                <tr v-for="(attr, index) of selNodeAttrs" :key="index">
-                  <td contenteditable="true">{{attr.name}}</td>
-                  <td contenteditable="true">{{attr.value}}</td>
+                <tr v-for="(attr, index) of selNodeAttrs" :key="attr.id" class="tr-attr">
+                  <td contenteditable="true" class="attr-name" v-text="attr.name"></td>
+                  <td contenteditable="true" class="attr-value" v-text="attr.value"></td>
                 </tr>
-                <tr><td colspan="2" class="tar"><button type="button" class="fr btn btn-sm btn-primary btn-save-attr">保存</button></td></tr>
+                <tr v-show="selNodeAttrs.length"><td colspan="2" class="tar"><button type="button" class="fr btn btn-sm btn-primary btn-save-attr" @click="saveAttr">保存</button></td></tr>
               </tbody>
             </table>
           </div>
@@ -236,6 +288,21 @@ export default {
   .btn-save-attr {
     margin-right: 20px;
   }
+  th {
+    padding: 0 15px;
+  }
+  td:first-child, th:first-child {
+    width: 30%;
+    border: 1px solid #ddd;
+  }
+  td:last-child, th:last-child {
+    width: 70%;
+  }
 }
-
+.ztree button{
+  background: red;
+}
+// #ztree li span.button {
+//   background-position: 100% -1px;
+// }
 </style>

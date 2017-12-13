@@ -36,7 +36,12 @@ npm run build
       <title><%= htmlWebpackPlugin.options.title %></title>
       <link rel="stylesheet" href="./assets/style/bootstrap.min.css">
     </head>
-    <body></body>
+    <body>
+      <topbar></topbar>
+      <sidebar></sidebar>
+        <!-- 这里写主要部分 -->
+      <footerbar></footerbar>
+    </body>
     <script src="./assets/lib/bootstrap.min.js"></script>
     </html>
   ```

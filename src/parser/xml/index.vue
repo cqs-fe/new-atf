@@ -1,9 +1,15 @@
 <script>
 import zTree from "ztree";
+import nodeShow from './node-show';
 export default {
+	components: { nodeShow }, 
   data() {
     var me = this;
     return {
+      NODE_TYPE: {
+        TEXT_NODE: 3,
+        ELEMENT_NODE: 1
+      },
       xmlCode: `<main class="main-wrap">
     <div class="panel panel-default  ztree-wrapper">
         <div class="panel-heading">xml结构</div>
@@ -30,7 +36,7 @@ export default {
       zTreeObj: null,
       zTreeSetting: {
         view: {
-          showIcon: false,
+        //   showIcon: false,
           addHoverDom: this.addHoverDom,
           removeHoverDom: this.removeHoverDom
         },
@@ -44,30 +50,32 @@ export default {
         }
       },
       zTreeNodes: [],
-      // selNodeAttrs: [], // 选中的节点的属性
-      tId: null, // 选中的节点ID
+      // 
+      tId: null // 选中的节点ID
     };
   },
   created() {
     var me = this;
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener("DOMContentLoaded", function() {
       me.format();
-    })
+    });
   },
   computed: {
     selNodeAttrs: function() {
-      if (this.zTreeObj) {
-        let node = this.zTreeObj.getNodeByTId(this.tId);
-        return node ? node.attributes : [];
-      } else {
-        return [];
-      }
-    }
+		if (this.tId) {
+			return [];
+		}
+		return [];
+	},
+	selNodeSubTags: function() {
+		if (this.tId) {
+			return [];
+		}
+		return [];
+	}
   },
-  directives: {
-  },
-  watch: {
-  },
+  directives: {},
+  watch: {},
   methods: {
     format: function() {
       this.xmlCode = vkbeautify.xml(this.xmlCode);
@@ -87,11 +95,13 @@ export default {
         this.dom2Obj(this.xmlObject)
       );
       let node = this.zTreeObj.getNodeByTId(this.tId);
-      if(node) {
+      if (node) {
         this.zTreeObj.selectNode(node);
       }
     },
     dom2Obj: function(dom) {
+      var me = this;
+      console.log(dom.children);
       var a = [];
       for (let child of [...dom.children].slice(0, 1)) {
         a.push(getNodes(child));
@@ -101,53 +111,68 @@ export default {
       /**
        * 生成的节点：
        {
-          name: string 节点名称
-          attrbutes: { Array[{ name: attrName, value: attrValue }] }  节点的属性集合
+          name: string 显示的节点名称
           children: { Array[{node}] }  节点的子节点
+          type: string 节点的类型， 可选值为 text, node, attribute
        }
        */
       function getNodes(domNode) {
         let node = { open: true };
         node.name = domNode.nodeName;
-        let attributes = [];
+        node.children = [];
+        // 添加属性
         for (let attr of domNode.attributes) {
-          attributes.push({
-            name: attr.name,
-            value: attr.value
+          // 把属性节点塞入children中
+          node.children.push({
+            name: `${attr.name}="${attr.value}"`,
+            type: "attribute",
+            children: [],
+			icon: '/assets/style/img/diy/9.png'
           });
         }
-        node.attributes = attributes;
-        node.children = [];
-        for (let child of domNode.children) {
+        // 添加子节点
+        for (let child of domNode.childNodes) {
           if (child.nodeName === "parsererror") {
             continue;
           }
-          node.children.push(getNodes(child));
-        }
-        if (domNode.children.length === 0) {
-          node.value = domNode.innerHTML;
-        }
+          if (child.nodeType === me.NODE_TYPE.TEXT_NODE) {
+			let nodeValue = child.nodeValue.replace(/\s*/g, "");
+            if (nodeValue === "") {
+              	continue;
+            }
+			node.children.push({
+				name: nodeValue,
+				type: 'text',
+				children: [],
+				icon: '/assets/style/img/diy/8.png'
+			})
+          } else {
+			  node.children.push(getNodes(child));
+          }
+		}
+		// node.icon = '/assets/style/img/diy/1_open.png';
         return node;
       }
     },
     obj2Xml: function(obj) {
-      let attrs = [];
-      for (let attr of obj.attributes) {
-        attrs.push(`${attr.name}="${attr.value}"`);
-      }
-      let children = [];
-      if (obj.children.length > 0) {
-        for (let child of obj.children) {
-          children.push(this.obj2Xml(child));
-        }
-        return `<${obj.name} ${attrs.join(" ")}>${children.join(
-          ""
-        )}</${obj.name}>`;
-      } else {
-        return `<${obj.name} ${attrs.join(" ")}>${$.trim(
-          obj.value
-        )}</${obj.name}>`;
-      }
+		// 判断类型
+		if (obj.type === 'text') {
+			return obj.name;
+		} else if (obj.type === 'attribute') {
+			return obj.name;
+		} else {
+			let attrs = [];
+			let elements = [];
+			obj.children.forEach(child => {
+				if (child.type === 'attribute') {
+					attrs.push(this.obj2Xml(child));
+				} else {
+					elements.push(this.obj2Xml(child));
+				}
+			});
+			return `
+				<${obj.name} ${attrs.join(" ")}>${elements.join('')}</${obj.name}>`;
+		}
     },
     commonInRenameAndRemove: function() {
       let rootNode = this.zTreeObj.getNodes()[0];
@@ -164,39 +189,57 @@ export default {
     },
     resetTId: function() {
       let node = this.zTreeObj ? this.zTreeObj.getNodeByTId(this.tId) : null;
-      if (!node) { this.tId = null; }
+      if (!node) {
+        this.tId = null;
+      }
     },
     // 点击节点后的回调
     onzTreeClick: function(event, treeId, treeNode) {
       this.tId = treeNode.tId;
     },
     // 鼠标悬浮，显示增加节点按钮
-    addHoverDom: function(treeId, treeNode){
+    addHoverDom: function(treeId, treeNode) {
+		if (treeNode.type === 'text' || treeNode.type === 'attribute') {
+			return;
+		}
       let me = this;
       var sObj = $("#" + treeNode.tId + "_span");
-			if (treeNode.editNameFlag || $("#addBtn_"+treeNode.tId).length>0) return;
-			var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
-				+ "' title='add node' onfocus='this.blur();' style='background-position: 100% -1px;'></span>";
-			sObj.after(addStr);
-			var btn = $("#addBtn_"+treeNode.tId);
-			if (btn) btn.bind("click", function(){
-        me.zTreeObj.addNodes(treeNode, -1, { name:"new node", attributes: [], children: [] });
-        me.commonInRenameAndRemove();
-				return false;
-			});
+      if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0)
+        return;
+      var addStr =
+        "<span class='button add' id='addBtn_" +
+        treeNode.tId +
+        "' title='add node' onfocus='this.blur();' style='background-position: 100% -1px;'></span>";
+      sObj.after(addStr);
+      var btn = $("#addBtn_" + treeNode.tId);
+      if (btn)
+        btn.bind("click", function() {
+          me.zTreeObj.addNodes(treeNode, -1, {
+            name: "newnode",
+			children: [],
+			type: 'node'
+          });
+          me.commonInRenameAndRemove();
+          return false;
+        });
     },
     // 鼠标悬浮显示删除节点按钮
-    removeHoverDom: function (treeId, treeNode) {
-      $("#addBtn_"+treeNode.tId).unbind().remove();
+    removeHoverDom: function(treeId, treeNode) {
+		if (treeNode.type === 'text' || treeNode.type === 'attribute') {
+			return;
+		}
+      $("#addBtn_" + treeNode.tId)
+        .unbind()
+        .remove();
     },
     // 保存节点属性
-    saveAttr: function () {
+    saveAttr: function() {
       var attrs = [];
-      var trs = document.querySelectorAll('.tr-attr');
+      var trs = document.querySelectorAll(".tr-attr");
       for (let tr of trs) {
         attrs.push({
-          name: tr.querySelector('.attr-name').innerHTML,
-          value: tr.querySelector('.attr-value').innerHTML
+          name: tr.querySelector(".attr-name").innerHTML,
+          value: tr.querySelector(".attr-value").innerHTML
         });
       }
       this.zTreeObj.getNodeByTId(this.tId).attributes = attrs;
@@ -222,20 +265,9 @@ export default {
         </div>
       </div>
       <div class="panel panel-default  edit-node">
-        <div class="panel-heading">节点属性</div>
+        <div class="panel-heading">节点详情</div>
         <div class="panel-body ">
-          <div id="edit-node" class="">
-            <table class="table table-bordered table-condensed attr-table">
-              <tr><th>属性名</th><th>属性值</th></tr>
-              <tbody>
-                <tr v-for="(attr, index) of selNodeAttrs" :key="attr.id" class="tr-attr">
-                  <td contenteditable="true" class="attr-name" v-text="attr.name"></td>
-                  <td contenteditable="true" class="attr-value" v-text="attr.value"></td>
-                </tr>
-                <tr v-show="selNodeAttrs.length"><td colspan="2" class="tar"><button type="button" class="fr btn btn-sm btn-primary btn-save-attr" @click="saveAttr">保存</button></td></tr>
-              </tbody>
-            </table>
-          </div>
+			<node-show text=""></node-show>
         </div>
       </div>
     </div>
@@ -263,7 +295,7 @@ export default {
   height: calc(100vh - 120px);
 }
 .edit-node {
-  flex: 0 0 50% ;
+  flex: 0 0 50%;
 }
 .xml-wrapper {
   flex: 0 0 60%;
@@ -276,6 +308,9 @@ export default {
 .panel-body {
   height: 84%;
   padding: 5px;
+}
+.panel-heading {
+	padding: 1px 15px;
 }
 .xml-textarea {
   width: 100%;
@@ -291,15 +326,17 @@ export default {
   th {
     padding: 0 15px;
   }
-  td:first-child, th:first-child {
+  td:first-child,
+  th:first-child {
     width: 30%;
     border: 1px solid #ddd;
   }
-  td:last-child, th:last-child {
+  td:last-child,
+  th:last-child {
     width: 70%;
   }
 }
-.ztree button{
+.ztree button {
   background: red;
 }
 // #ztree li span.button {

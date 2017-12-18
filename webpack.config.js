@@ -76,10 +76,10 @@ module.exports = {
     }
   },
   plugins: [
-    new CleanWebpackPlugin(['./dist'], {
-      // allow the plugin to clean folders outside of the webpack root.
-      allowExternal: true
-    }),
+    // new CleanWebpackPlugin(['./dist'], {
+    //   // allow the plugin to clean folders outside of the webpack root.
+    //   allowExternal: true
+    // }),
     // 提取公共的依赖
     new webpack.optimize.CommonsChunkPlugin({
       names: ['vendor', 'manifest']

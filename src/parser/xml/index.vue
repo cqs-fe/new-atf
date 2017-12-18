@@ -41,17 +41,25 @@ export default {
           removeHoverDom: this.removeHoverDom
         },
         edit: {
-          enable: true
+			enable: true,
+			drag: {
+				autoExpandTrigger: true,
+				isCopy: true,
+				isMove: true
+			}
         },
         callback: {
           onRemove: this.onRemove,
           onRename: this.onRename,
-          onClick: this.onzTreeClick
+		  onClick: this.onzTreeClick,
+		  beforeDrop: this.beforeDrop,
+		  onDrop: this.onDrop
         }
       },
       zTreeNodes: [],
-      // 
-      tId: null // 选中的节点ID
+	  // 选中节点相关
+	  tId: null,
+      selTreeNode: null, // 选中的节点
     };
   },
   created() {
@@ -61,18 +69,22 @@ export default {
     });
   },
   computed: {
-    selNodeAttrs: function() {
-		if (this.tId) {
-			return [];
+		selNodeType: function() {
+			return this.selTreeNode ? this.selTreeNode.type : '';
+		},
+		selTextNode: function() {
+			let str = this.selTreeNode ? this.selTreeNode.name : '';
+			if (this.selTreeNode) {
+				return this.selTreeNode.name
+			}
+			return '';
+		},
+		selAttrNode: function() {
+			return this.selTreeNode ? this.selTreeNode.name : '';
+		},
+		selNode: {
+			
 		}
-		return [];
-	},
-	selNodeSubTags: function() {
-		if (this.tId) {
-			return [];
-		}
-		return [];
-	}
   },
   directives: {},
   watch: {},
@@ -101,7 +113,7 @@ export default {
     },
     dom2Obj: function(dom) {
       var me = this;
-      console.log(dom.children);
+    //   console.log(dom.children);
       var a = [];
       for (let child of [...dom.children].slice(0, 1)) {
         a.push(getNodes(child));
@@ -126,8 +138,8 @@ export default {
           node.children.push({
             name: `${attr.name}="${attr.value}"`,
             type: "attribute",
-            children: [],
-			icon: '/assets/style/img/diy/9.png'
+			icon: '/assets/style/img/diy/9.png',
+			drop:false
           });
         }
         // 添加子节点
@@ -143,13 +155,14 @@ export default {
 			node.children.push({
 				name: nodeValue,
 				type: 'text',
-				children: [],
-				icon: '/assets/style/img/diy/8.png'
+				icon: '/assets/style/img/diy/8.png',
+				drop:false
 			})
           } else {
 			  node.children.push(getNodes(child));
           }
 		}
+		node.type = 'node';
 		// node.icon = '/assets/style/img/diy/1_open.png';
         return node;
       }
@@ -164,14 +177,14 @@ export default {
 			let attrs = [];
 			let elements = [];
 			obj.children.forEach(child => {
-				if (child.type === 'attribute') {
-					attrs.push(this.obj2Xml(child));
-				} else {
-					elements.push(this.obj2Xml(child));
-				}
+			if (child.type === 'attribute') {
+				attrs.push(this.obj2Xml(child));
+			} else {
+				elements.push(this.obj2Xml(child));
+			}
 			});
 			return `
-				<${obj.name} ${attrs.join(" ")}>${elements.join('')}</${obj.name}>`;
+			<${obj.name} ${attrs.join(" ")}>${elements.join('')}</${obj.name}>`;
 		}
     },
     commonInRenameAndRemove: function() {
@@ -179,7 +192,6 @@ export default {
       this.xmlCode = rootNode
         ? $.trim(vkbeautify.xml($.trim(this.obj2Xml(rootNode))))
         : "";
-      this.resetTId();
     },
     onRemove: function(event, treeId, treeNode) {
       this.commonInRenameAndRemove();
@@ -188,14 +200,15 @@ export default {
       this.commonInRenameAndRemove();
     },
     resetTId: function() {
-      let node = this.zTreeObj ? this.zTreeObj.getNodeByTId(this.tId) : null;
-      if (!node) {
-        this.tId = null;
-      }
+    //   let node = this.zTreeObj ? this.zTreeObj.getNodeByTId(this.tId) : null;
+    //   if (!node) {
+    //     this.tId = null;
+    //   }
     },
     // 点击节点后的回调
     onzTreeClick: function(event, treeId, treeNode) {
-      this.tId = treeNode.tId;
+    	this.selTreeNode = treeNode;
+		  this.tId = treeNode.tId;
     },
     // 鼠标悬浮，显示增加节点按钮
     addHoverDom: function(treeId, treeNode) {
@@ -215,9 +228,8 @@ export default {
       if (btn)
         btn.bind("click", function() {
           me.zTreeObj.addNodes(treeNode, -1, {
-            name: "newnode",
-			children: [],
-			type: 'node'
+        		name: "newnode",
+				type: 'node'
           });
           me.commonInRenameAndRemove();
           return false;
@@ -231,19 +243,40 @@ export default {
       $("#addBtn_" + treeNode.tId)
         .unbind()
         .remove();
-    },
+	},
+	beforeDrop: function(treeId, treeNodes, targetNode, moveType) {
+		if (targetNode.type !== 'node' && moveType === 'inner') {
+			return false;
+		}
+	},
+	onDrop: function(event, treeId, treeNodes, targetNode, moveType) {
+		this.commonInRenameAndRemove();
+	},
     // 保存节点属性
-    saveAttr: function() {
-      var attrs = [];
-      var trs = document.querySelectorAll(".tr-attr");
-      for (let tr of trs) {
-        attrs.push({
-          name: tr.querySelector(".attr-name").innerHTML,
-          value: tr.querySelector(".attr-value").innerHTML
-        });
-      }
-      this.zTreeObj.getNodeByTId(this.tId).attributes = attrs;
-      this.commonInRenameAndRemove();
+    saveAttr: function(type, data) {
+		if (type === 1 || type === 2) {console.log(data)
+			let node = this.tId ? this.zTreeObj.getNodeByTId(this.tId) : null;
+			if (node) {
+				node.name = data;
+				this.zTreeObj.updateNode(node);
+				this.commonInRenameAndRemove();
+			} else {
+				alert('请重新选择节点');
+				this.tId = null;
+				this.selTreeNode = null;
+			}
+			
+		}
+    //   var attrs = [];
+    //   var trs = document.querySelectorAll(".tr-attr");
+    //   for (let tr of trs) {
+    //     attrs.push({
+    //       name: tr.querySelector(".attr-name").innerHTML,
+    //       value: tr.querySelector(".attr-value").innerHTML
+    //     });
+    //   }
+    //   this.zTreeObj.getNodeByTId(this.tId).attributes = attrs;
+    //   this.commonInRenameAndRemove();
     }
   }
 };
@@ -267,14 +300,15 @@ export default {
       <div class="panel panel-default  edit-node">
         <div class="panel-heading">节点详情</div>
         <div class="panel-body ">
-			<node-show text=""></node-show>
+			  <node-show :text="selTextNode" :attribute="selAttrNode"
+			   :showType="selNodeType" @saveData="saveAttr"></node-show>
         </div>
       </div>
     </div>
 
 	</main>
 </template>
-<style lang="scss"  scoped >
+<style lang="scss" scoped >
 .fr {
   float: right;
 }

@@ -1,5 +1,7 @@
-const address = "http://10.108.223.23:8080/ATFCloud/";
+const address = 'http://10.108.223.23:8080/ATFCloud/';
+const baseUrl = '/ATFCloud/';
 
-export {
-  address
+module.exports = {
+  address,
+  baseUrl
 }

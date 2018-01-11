@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        <%= htmlWebpackPlugin.options.title %>
+    </title>
+    <link rel="stylesheet" href="./assets/style/bootstrap.min.css">
+    <link rel="stylesheet" href="./style/main.css">
+    <link rel="stylesheet" href="./assets/style/app.css">
+</head>
+
+<body>
+    <div id="root" class="root">
+        <topbar></topbar>
+        <sidebar></sidebar>
+        <main class="main">
+            <ol class="breadcrumb">
+                <li>
+                    <a href="#">一级导航条</a>
+                </li>
+                <li class="active">示例页面</li>
+            </ol>
+            <div class="main-content">
+                <!-- 在这里写主要内容 -->
+                <el-table
+                :data="tableData"
+                style="width: 100%">
+                <el-table-column
+                  prop="date"
+                  label="日期"
+                  width="180">
+                </el-table-column>
+                <el-table-column
+                  prop="name"
+                  label="姓名"
+                  width="180">
+                </el-table-column>
+                <el-table-column
+                  prop="address"
+                  label="地址">
+                </el-table-column>
+              </el-table>
+            </div>
+            <footerbar></footerbar>
+        </main>
+    </div>
+</body>
+<script src="./assets/lib/bootstrap.min.js"></script>
+
+</html>

@@ -13,5 +13,13 @@ html, body {
   padding: 10px 10px;
   overflow-y: auto;
   display: flex;
+  flex-direction: column;
   height: calc(100% - 60px);
+}
+.breadcrumb {
+  flex: 0 0 auto;
+  margin-bottom: 10px;
+}
+.main-content {
+  flex: 1 0 auto;
 }

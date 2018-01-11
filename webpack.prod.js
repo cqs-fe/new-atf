@@ -7,7 +7,7 @@ const common = require('./webpack.common');
 module.exports = merge(common, {
     plugins: [
         new UglifyJSPlugin({
-            include: [path.join(__dirname, dir)],
+            include: [path.join(__dirname, 'src')],
             sourceMap: true
         })
     ]

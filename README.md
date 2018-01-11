@@ -39,8 +39,22 @@ npm run build
     <body>
       <topbar></topbar>
       <sidebar></sidebar>
-        <!-- 这里写主要部分 -->
-      <footerbar></footerbar>
+       <main class="main">
+            <!-- 这里是本页面的导航条 -->
+            <ol class="breadcrumb">
+                <li>
+                    <a href="#">一级导航条</a>
+                </li>
+                <li class="active">示例页面</li>
+            </ol>
+            <!-- main content -->
+            <div class="main-content">
+              <!-- 这里写主要内容 -->
+            </div>
+             <!-- main content end-->
+            <!-- 这是页面的 footer -->
+            <footerbar></footerbar>
+        </main>
     </body>
     <script src="./assets/lib/bootstrap.min.js"></script>
     </html>

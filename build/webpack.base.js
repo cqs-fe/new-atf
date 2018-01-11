@@ -3,10 +3,11 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
  * 入口文件配置
  */
 var entry = {
-  'vendor': ['jquery', 'vue'],
+  'vendor': ['jquery', 'vue', 'element-ui'],
   'main': ['./src/main.js'],
   'parser': ['./src/parser/index.js'],
-  'login': ['./src/login/index.js']
+  'login': ['./src/login/index.js'],
+  'examplepage': ['./src/examplepage/index.js']
 }
 
 /**
@@ -27,7 +28,8 @@ const getHtmlConfig = function (name, title) {
 // 配置生成html文件
 const htmlWebpackPlugins = [
   new HtmlWebpackPlugin(getHtmlConfig('parser', 'xml')),
-  new HtmlWebpackPlugin(getHtmlConfig('login', '用户登录'))
+  new HtmlWebpackPlugin(getHtmlConfig('login', '用户登录')),
+  new HtmlWebpackPlugin(getHtmlConfig('examplepage', '示例页面'))
 ];
 
 module.exports = {

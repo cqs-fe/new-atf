@@ -3,8 +3,8 @@ import './index.css';
 export default {
     name: 'sidebar',
     props: {
-        activeIndex: {
-            default: 0
+        activeIndexs: {
+            default: ['0']
         },
         activeSubIndex: {
             default: '0-0'
@@ -89,7 +89,13 @@ export default {
     },
     methods: {
         activeSub (key) {
-            this.activeIndex = key;
+            if (this.activeIndexs.includes(key)) {
+                let set = new Set(this.activeIndexs);
+                set.delete(key);
+                this.activeIndexs = [...set];
+            } else {
+                this.activeIndexs.push(key);
+            }
         },
         beforeEnter: function (el) {
             if (!el.dataset) el.dataset = {};

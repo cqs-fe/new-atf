@@ -1,36 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title><%= htmlWebpackPlugin.options.title %></title>
+  <title>
+    <%= htmlWebpackPlugin.options.title %>
+  </title>
   <link rel="stylesheet" href="./assets/style/bootstrap.min.css">
   <link rel="stylesheet" href="./assets/style/zTreeStyle.css">
   <link rel="stylesheet" href="./assets/style/app.css">
 </head>
+
 <body>
   <div id="root" class="root">
     <topbar></topbar>
     <sidebar></sidebar>
     <main class="main">
       <ol class="breadcrumb">
-        <li><a href="#">接口管理</a></li>
+        <li>
+          <a href="#">接口管理</a>
+        </li>
         <li class="active">xml与json解析</li>
       </ol>
-        <!-- Nav tabs -->
+      <!-- Nav tabs -->
       <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">JSON</a></li>
-        <li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">XML</a></li>
+        <li role="presentation">
+          <a href="#home" aria-controls="home" role="tab" data-toggle="tab">JSON</a>
+        </li>
+        <li role="presentation" class="active">
+          <a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">XML</a>
+        </li>
       </ul>
       <div class="tab-content">
-          <div role="tabpanel" class="tab-pane" id="home">json</div>
-          <div role="tabpanel" class="tab-pane active" id="profile"><xml></xml></div>
+        <div role="tabpanel" class="tab-pane" id="home">json</div>
+        <div role="tabpanel" class="tab-pane active" id="profile">
+          <xml></xml>
         </div>
+      </div>
+      <footerbar></footerbar>
     </main>
-    <footerbar></footerbar>
   </div>
 </body>
 <script src="./assets/lib/bootstrap.min.js"></script>
 <script src="./assets/lib/vkbeautify.js"></script>
+
 </html>

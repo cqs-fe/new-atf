@@ -5,7 +5,9 @@ import Footerbar from '@/components/footerbar/index.vue';
 
 import Xml from './xml/index.vue';
 import './index.scss';
+import ElementUI from 'element-ui';
 
+Vue.use(ElementUI, { size: 'small' });
 new Vue({
   el: '#root',
   data: {

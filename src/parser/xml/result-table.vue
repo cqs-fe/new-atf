@@ -1,102 +1,183 @@
 <script>
 export default {
 	name: 'result-table',
-	props: ['xmlCode'],
+	props: ['xmlCode', 'interfaceId'],
 	data () {
 		return {
-			rows: [
-				{name: '张三', property: 'akjsdhf', dataDictionary: true, parazation: false, fixedValue: 234, chineseName: '参数案发时代'},
-				{name: '张三', property: 'akjsdhf', dataDictionary: true, parazation: false, fixedValue: 234, chineseName: '参数案发时代'},
-				{name: '张三', property: 'akjsdhf', dataDictionary: true, parazation: false, fixedValue: 234, chineseName: '参数案发时代'},
-				{name: '张三', property: 'akjsdhf', dataDictionary: true, parazation: false, fixedValue: 234, chineseName: '参数案发时代'},
-				{name: '张三', property: 'akjsdhf', dataDictionary: true, parazation: false, fixedValue: 234, chineseName: '参数案发时代'},
-				{name: '张三', property: 'akjsdhf', dataDictionary: true, parazation: false, fixedValue: 234, chineseName: '参数案发时代'},
-				{name: '张三', property: 'akjsdhf', dataDictionary: true, parazation: false, fixedValue: 234, chineseName: '参数案发时代'},
-				{name: '张三', property: 'akjsdhf', dataDictionary: true, parazation: false, fixedValue: 234, chineseName: '参数案发时代'},
-				{name: '张三', property: 'akjsdhf', dataDictionary: true, parazation: false, fixedValue: 234, chineseName: '参数案发时代'},
-				{name: '张三', property: 'akjsdhf', dataDictionary: true, parazation: false, fixedValue: 234, chineseName: '参数案发时代'},
-				{name: '张三', property: 'akjsdhf', dataDictionary: true, parazation: false, fixedValue: 234, chineseName: '参数案发时代'}
+			rows: [],
+			propertyEnum:[
+				{ value: 1, name: '参数' },
+				{ value: 2, name: '非参数' },
+				{ value: 3, name: '复合类型' }
+			],
+			useDictEnum: [
+				{ value: true, name: '是' },
+				{ value: false, name: '否' }
+			],
+			parazationEnum: [
+				{ value: true, name: '是' },
+				{ value: false, name: '否' }
 			]
-		};
+		}
 	},
-	created () {
-		
+	created () {	
 	},
 	methods: {
-		getData () {
-			let data = {xmlCode: this.xmlCode };
+		parseXml () {
+			var me = this;
+			let data = { interfaceId: this.interfaceId, xmlBody: this.xmlCode };
 			ajax({
-				url: 'a/b',
+				url: address + 'interfaceController/parseXmlBody',
 				data: data,
-				success: function(data) {
-					console.log(data);
+				success: function (data) {
+					if (data.retCode === '0000') {
+						me.$notify({
+							title: '成功',
+							message: data.retMsg,
+							type: 'success'
+						});
+						me.rows = data.paramList;
+					} else {
+						me.$notify.error({
+							title: '错误提示',
+							message: data.retMsg
+						});
+					}
+				},
+				error: function () {
+					me.$notify.error({
+						title: '错误提示',
+						message: '出现网络错误，请稍后重试！'
+					});
+				}
+			});
+		},
+		saveXml() {
+			var me = this;
+			var data = {  interfaceId: this.interfaceId, paramListJson: JSON.stringify(this.rows) };
+			console.log(data.paramListJson)
+			ajax({
+				url: address + 'interfaceController/saveParamInfo',
+				data: data,
+				success: function (data) {
+					if (data.retCode === '0000') {
+						me.$notify({
+							title: '成功提示',
+							message: data.retMsg,
+							type: 'success'
+						});
+					} else {
+						me.$notify.error({
+							title: '错误提示',
+							message: data.retMsg
+						});
+					}
+				},
+				error: function () {
+					me.$notify.error({
+						title: '错误提示',
+						message: '出现网络错误，请稍后重试！'
+					});
 				}
 			});
 		}
 	}
 }
+// {
+// 	"id": 230,
+// 	"name": "xml",
+// 	"interfaceId": 8,
+// 	"chName": null,
+// 	"property": null,
+// 	"useDictionary": null,
+// 	"parameterization": null,
+// 	"defaultValue": null,
+// 	"serialNumber": 1,
+// 	"xpath": "/xml"
+// },
 </script>
 <template>
 	<div class="wrapper">
-		<div class="col-sm-12"><button class="btn btn-primary" @click="getData()">发送xml</button></div>
+		<div class="col-sm-12">
+			<button class="btn btn-primary" @click="parseXml()">解析XML</button>
+			<button v-if="rows.length > 0" class="btn btn-primary" @click="saveXml()">保存</button>
+		</div>
 		<div class="">
-			<table class="table table-striped table-bordered table-condensed">
-				<thead>
-					<tr>
-						<th>#</th>
-						<th>名称</th>
-						<th class="property">参数性质</th>
-						<th class="dictionary">是否使用<br>数据字典</th>
-						<th class="parazation">是否<br>参数化</t>
-						<th class="fixed-value">固定值</th>
-						<th class="chinese-name">中文名</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr v-for="(row, index) in rows" :key="index">
-						<td>{{index + 1}}</td>
-						<td>{{row.name}}</td>
-						<td class="property">
-							<select>
-								<template v-if="row.dataDictionay == true">
-									<option :value="true" selected>是</option>
-									<option :value="false">否</option>
-								</template>
-								<template v-else>
-									<option :value="true">是</option>
-									<option :value="false" selected>否</option>
-								</template>
-							</select>
-						</td>
-						<td class="dictionary">
-							<select>
-								<template v-if="row.dataDictionay == true">
-									<option :value="true" selected>是</option>
-									<option :value="false">否</option>
-								</template>
-								<template v-else>
-									<option :value="true">是</option>
-									<option :value="false" selected>否</option>
-								</template>
-							</select>
-						</td>
-						<td class="parazation">
-							<select>
-								<template v-if="row.parazation == true">
-									<option :value="true" selected>是</option>
-									<option :value="false">否</option>
-								</template>
-								<template v-else>
-									<option :value="true">是</option>
-									<option :value="false" selected>否</option>
-								</template>
-							</select>
-						</td>
-						<td contenteditable="true" class="fixed-value">{{row.fixedValue}}</td>
-						<td contenteditable="true" class="chinese-name">{{chineseName}}</td>
-					</tr>
-				</tbody>
-			</table>
+			<el-table :data="rows" height="500">
+				<el-table-column
+					type="index"
+					width="25">
+				</el-table-column>
+				 <el-table-column
+					prop="name"
+					label="名称"
+					width="80"
+					>
+				</el-table-column>
+				<el-table-column
+					prop="property"
+					label="属性"
+					width="120"
+					>
+					<template slot-scope="scope">
+						<el-select v-model="scope.row.property" placeholder="">
+							<el-option
+							:size="mini"
+							v-for="p in propertyEnum"
+							:key="p.value"
+							:label="p.name"
+							:value="p.value">
+							</el-option>
+						</el-select>
+					</template>
+				</el-table-column>
+				<el-table-column
+					prop="useDictionary"
+					label="使用数据字典"
+					width="80">
+					<template slot-scope="scope">
+						<el-select v-model="scope.row.useDictionary" placeholder="">
+							<el-option
+							:size="mini"
+							v-for="p in useDictEnum"
+							:key="p.value"
+							:label="p.name"
+							:value="p.value">
+							</el-option>
+						</el-select>
+					</template>
+				</el-table-column>
+				<el-table-column
+					prop="parameterization"
+					label="参数化"
+					>
+					<template slot-scope="scope">
+						<el-select v-model="scope.row.parameterization" placeholder="">
+							<el-option
+							:size="mini"
+							v-for="p in parazationEnum"
+							:key="p.value"
+							:label="p.name"
+							:value="p.value">
+							</el-option>
+						</el-select>
+					</template>
+				</el-table-column>
+				<el-table-column
+					prop="defaultValue"
+					label="固定值">
+					<template slot-scope="scope">
+						<el-input type="textarea" v-model="scope.row.defaultValue" placeholder="请输入内容"></el-input>
+					</template>
+				</el-table-column>
+				<el-table-column
+					prop="chName"
+					label="中文名">
+					<template slot-scope="scope">
+					<el-input type="textarea" v-model="scope.row.chName" placeholder="请输入内容"></el-input>
+					</template>
+				</el-table-column>
+			</el-table>
 		</div>
 	</div>
 </template>

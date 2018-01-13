@@ -1,0 +1,30 @@
+{
+  "retCode": "0000",
+  "retMsg": "解析成功",
+  "paramList": [
+    {
+      "id": 230,
+      "name": "xml",
+      "interfaceId": 8,
+      "chName": null,
+      "property": 1,
+      "useDictionary": null,
+      "parameterization": null,
+      "defaultValue": null,
+      "serialNumber": 1,
+      "xpath": "/xml"
+    },
+    {
+      "id": 231,
+      "name": "a",
+      "interfaceId": 8,
+      "chName": null,
+      "property": 3,
+      "useDictionary": null,
+      "parameterization": null,
+      "defaultValue": "hahahh",
+      "serialNumber": 2,
+      "xpath": "/xml/a"
+    }
+  ]
+}

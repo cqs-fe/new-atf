@@ -48,11 +48,12 @@ export default {
       zTreeNodes: [],
       // 选中节点相关
       tId: null,
-      selTreeNode: null // 选中的节点
+      selTreeNode: null, // 选中的节点，
+
+      interfaceId: 8
     };
   },
   created() {
-    alert(address);
     var me = this;
     document.addEventListener("DOMContentLoaded", function() {
       me.format();
@@ -230,52 +231,6 @@ export default {
       $("#addBtn_" + treeNode.tId)
         .unbind()
         .remove();
-<<<<<<< HEAD
-	},
-	beforeDrop: function(treeId, treeNodes, targetNode, moveType) {
-		if (targetNode.type !== 'node' && moveType === 'inner') {
-			return false;
-		}
-	},
-	onDrop: function(event, treeId, treeNodes, targetNode, moveType) {
-		this.commonInRenameAndRemove();
-	},
-  // 保存节点属性
-  saveAttr: function(type, data) {
-    if (type === 1 || type === 2) {console.log(data)
-      let node = this.tId ? this.zTreeObj.getNodeByTId(this.tId) : null;
-      if (node) {
-        node.name = data;
-        this.zTreeObj.updateNode(node);
-        this.commonInRenameAndRemove();
-      } else {
-        alert('请重新选择节点');
-        this.tId = null;
-        this.selTreeNode = null;
-      }
-      
-    }
-    //   var attrs = [];
-    //   var trs = document.querySelectorAll(".tr-attr");
-    //   for (let tr of trs) {
-    //     attrs.push({
-    //       name: tr.querySelector(".attr-name").innerHTML,
-    //       value: tr.querySelector(".attr-value").innerHTML
-    //     });
-    //   }
-    //   this.zTreeObj.getNodeByTId(this.tId).attributes = attrs;
-    //   this.commonInRenameAndRemove();
-  },
-  ajax () { alert(address);
-    $.ajax({
-      url: '/ATFCloud/a/b/aa',
-      success: function() {
-        alert(3333);
-      }
-    });
-  }
-
-=======
     },
     beforeDrop: function(treeId, treeNodes, targetNode, moveType) {
       if (targetNode.type !== "node" && moveType === "inner") {
@@ -311,22 +266,11 @@ export default {
       //   this.zTreeObj.getNodeByTId(this.tId).attributes = attrs;
       //   this.commonInRenameAndRemove();
     }
->>>>>>> fb355462a206fd2e3dee0889a3584bff64e17f31
   }
 };
 </script>
 
 <template>
-<<<<<<< HEAD
-	<main class="main-wrap">
-    <button @click="ajax">click</button>
-		<div class="panel panel-default  ztree-wrapper">
-			<div class="panel-heading">xml结构</div>
-			<div class="panel-body ">
-				<div id="ztree" class="ztree"></div>
-			</div>
-		</div>
-=======
   <main class="main-wrap">
     <div class="panel panel-default  ztree-wrapper">
       <div class="panel-heading">xml结构</div>
@@ -334,7 +278,6 @@ export default {
         <div id="ztree" class="ztree"></div>
       </div>
     </div>
->>>>>>> fb355462a206fd2e3dee0889a3584bff64e17f31
     <div class="xml-wrapper">
       <div class="panel panel-default edit-xml">
         <div class="panel-heading">xml文本</div>
@@ -351,15 +294,11 @@ export default {
       <div class="panel panel-default result-table-wrap">
         <div class="panel-heading">查询结果</div>
         <div class="panel-body">
-          <result-table :xml-code="xmlCode"></result-table>
+          <result-table :xml-code="xmlCode" :interface-id="interfaceId"></result-table>
         </div>
       </div>
     </div>
-<<<<<<< HEAD
-	</main>
-=======
   </main>
->>>>>>> fb355462a206fd2e3dee0889a3584bff64e17f31
 </template>
 <style lang="scss" scoped>
 .fr {
@@ -413,7 +352,7 @@ export default {
   }
 
   .node-detail {
-    flex: 0 0 180px;
+    flex: 0 0 240px;
   }
 }
 

@@ -5,6 +5,7 @@ const webpack = require('webpack'),
   CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');;
 const baseConfig = require('./build/webpack.base');
+const { address: ajaxBaseUrl, baseUrl } = require('./src/common/config'); // 获取ajax地址
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -76,10 +77,10 @@ module.exports = {
     }
   },
   plugins: [
-    // new CleanWebpackPlugin(['./dist'], {
-    //   // allow the plugin to clean folders outside of the webpack root.
-    //   allowExternal: true
-    // }),
+    new CleanWebpackPlugin(['./dist'], {
+      // allow the plugin to clean folders outside of the webpack root.
+      allowExternal: true
+    }),
     // 提取公共的依赖
     new webpack.optimize.CommonsChunkPlugin({
       names: ['vendor', 'manifest']
@@ -106,7 +107,20 @@ module.exports = {
     ...baseConfig.htmlWebpackPlugins,
   ],
   devServer: {
-    contentBase: './dist',
-    port: 9000
+    contentBase: '.',
+    port: '9000',
+      inline: true,
+      hot: true,
+      proxy: {
+          '*': {
+              bypass: function (req, res, proxyOptions) {
+                  if (req.url.startsWith(baseUrl)) {
+                      req.method = 'GET';
+                      console.log('/mock/' + req.url.slice(baseUrl.length) + '.json')
+                      return '/mock/' + req.url.slice(baseUrl.length) + '.json';
+                  }
+              }
+          }
+      }
   },
 }

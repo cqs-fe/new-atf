@@ -63,6 +63,7 @@ export default {
     };
   },
   created() {
+    alert(address);
     var me = this;
     document.addEventListener("DOMContentLoaded", function() {
       me.format();
@@ -252,21 +253,21 @@ export default {
 	onDrop: function(event, treeId, treeNodes, targetNode, moveType) {
 		this.commonInRenameAndRemove();
 	},
-    // 保存节点属性
-    saveAttr: function(type, data) {
-		if (type === 1 || type === 2) {console.log(data)
-			let node = this.tId ? this.zTreeObj.getNodeByTId(this.tId) : null;
-			if (node) {
-				node.name = data;
-				this.zTreeObj.updateNode(node);
-				this.commonInRenameAndRemove();
-			} else {
-				alert('请重新选择节点');
-				this.tId = null;
-				this.selTreeNode = null;
-			}
-			
-		}
+  // 保存节点属性
+  saveAttr: function(type, data) {
+    if (type === 1 || type === 2) {console.log(data)
+      let node = this.tId ? this.zTreeObj.getNodeByTId(this.tId) : null;
+      if (node) {
+        node.name = data;
+        this.zTreeObj.updateNode(node);
+        this.commonInRenameAndRemove();
+      } else {
+        alert('请重新选择节点');
+        this.tId = null;
+        this.selTreeNode = null;
+      }
+      
+    }
     //   var attrs = [];
     //   var trs = document.querySelectorAll(".tr-attr");
     //   for (let tr of trs) {
@@ -277,13 +278,23 @@ export default {
     //   }
     //   this.zTreeObj.getNodeByTId(this.tId).attributes = attrs;
     //   this.commonInRenameAndRemove();
-    }
+  },
+  ajax () { alert(address);
+    $.ajax({
+      url: '/ATFCloud/a/b/aa',
+      success: function() {
+        alert(3333);
+      }
+    });
+  }
+
   }
 };
 </script>
 
 <template>
 	<main class="main-wrap">
+    <button @click="ajax">click</button>
 		<div class="panel panel-default  ztree-wrapper">
 			<div class="panel-heading">xml结构</div>
 			<div class="panel-body ">
@@ -305,7 +316,6 @@ export default {
         </div>
       </div>
     </div>
-
 	</main>
 </template>
 <style lang="scss" scoped >

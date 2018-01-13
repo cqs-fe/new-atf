@@ -17,6 +17,7 @@ export default {
   .copy-right {
     height: 50px;
     clear: both;
+    flex: 0 0 auto;
   }
 </style>
 

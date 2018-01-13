@@ -39,8 +39,22 @@ npm run build
     <body>
       <topbar></topbar>
       <sidebar></sidebar>
-        <!-- 这里写主要部分 -->
-      <footerbar></footerbar>
+       <main class="main">
+            <!-- 这里是本页面的导航条 -->
+            <ol class="breadcrumb">
+                <li>
+                    <a href="#">一级导航条</a>
+                </li>
+                <li class="active">示例页面</li>
+            </ol>
+            <!-- main content -->
+            <div class="main-content">
+              <!-- 这里写主要内容 -->
+            </div>
+             <!-- main content end-->
+            <!-- 这是页面的 footer -->
+            <footerbar></footerbar>
+        </main>
     </body>
     <script src="./assets/lib/bootstrap.min.js"></script>
     </html>
@@ -68,3 +82,27 @@ npm run build
         new HtmlWebpackPlugin(getHtmlConfig('login', '用户登录'))
       ];
     ```
+
+## 开发提示
+### 全局使用ajax
+对 jQuery 的``ajax``方法进行了封装，由于后台返回的数据格式尚未确定，暂时只进行了最简单的封装。参考 ``/src/common/ajax.js``文件。
+### mock数据
+为了能在缺少后台接口的情况下进行开发，项目配置了 mock 数据的功能。使用如下：
+- 首先要在 ``/mock``下建立``.json``文件，如对应接口为 ``users/queryUser``，建立的文件目录为：
+    ```js
+        /mock/user/queryUser.json
+    ```
+- 在使用 `` npm start``启动的开发模式下， ``ajax``请求的 ``url``按照正常的格式传入时，会使用本地 mock 数据,
+    如：
+    ```js
+        ajax({
+            url: 'users/queryUser'
+        });
+    ```
+- 如果对某个接口不想使用 mock 数据，请按照一下方式传入 ``url``:
+    ```js
+        ajax({
+            url: address + 'users/queryUser'
+        });
+    ```
+    在``/src/main.js``文件中，已经将 ``address`` 暴露为全局变量，对应后台服务器的地址。

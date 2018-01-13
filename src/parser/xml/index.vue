@@ -1,8 +1,9 @@
 <script>
 import zTree from "ztree";
-import nodeShow from './node-show';
+import NodeShow from "./node-show";
+import ResultTable from './result-table';
 export default {
-	components: { nodeShow }, 
+  components: { NodeShow, ResultTable },
   data() {
     var me = this;
     return {
@@ -18,48 +19,36 @@ export default {
         </div>
     </div>
     <div class="xml-wrapper">
-        <div class="panel panel-default  edit-node">
-            <div class="panel-heading">xml文本</div>
-            <div class="panel-body ">
-                <textarea name="" class="xml-textarea" v-model="xmlCode"></textarea>
-            </div>
-        </div>
-        <div class="panel panel-default  edit-node">
-            <div class="panel-heading">节点属性</div>
-            <div class="panel-body ">
-                <div id="edit-node" class=""></div>
-            </div>
-        </div>
     </div>
 </main>`,
       xmlObject: null,
       zTreeObj: null,
       zTreeSetting: {
         view: {
-        //   showIcon: false,
+          //   showIcon: false,
           addHoverDom: this.addHoverDom,
           removeHoverDom: this.removeHoverDom
         },
         edit: {
-			enable: true,
-			drag: {
-				autoExpandTrigger: true,
-				isCopy: true,
-				isMove: true
-			}
+          enable: true,
+          drag: {
+            autoExpandTrigger: true,
+            isCopy: true,
+            isMove: true
+          }
         },
         callback: {
           onRemove: this.onRemove,
           onRename: this.onRename,
-		  onClick: this.onzTreeClick,
-		  beforeDrop: this.beforeDrop,
-		  onDrop: this.onDrop
+          onClick: this.onzTreeClick,
+          beforeDrop: this.beforeDrop,
+          onDrop: this.onDrop
         }
       },
       zTreeNodes: [],
-	  // 选中节点相关
-	  tId: null,
-      selTreeNode: null, // 选中的节点
+      // 选中节点相关
+      tId: null,
+      selTreeNode: null // 选中的节点
     };
   },
   created() {
@@ -70,22 +59,19 @@ export default {
     });
   },
   computed: {
-		selNodeType: function() {
-			return this.selTreeNode ? this.selTreeNode.type : '';
-		},
-		selTextNode: function() {
-			let str = this.selTreeNode ? this.selTreeNode.name : '';
-			if (this.selTreeNode) {
-				return this.selTreeNode.name
-			}
-			return '';
-		},
-		selAttrNode: function() {
-			return this.selTreeNode ? this.selTreeNode.name : '';
-		},
-		selNode: {
-			
-		}
+    selNodeType: function() {
+      return this.selTreeNode ? this.selTreeNode.type : "";
+    },
+    selTextNode: function() {
+      let str = this.selTreeNode ? this.selTreeNode.name : "";
+      if (this.selTreeNode) {
+        return this.selTreeNode.name;
+      }
+      return "";
+    },
+    selAttrNode: function() {
+      return this.selTreeNode ? this.selTreeNode.name : "";
+    }
   },
   directives: {},
   watch: {},
@@ -114,7 +100,7 @@ export default {
     },
     dom2Obj: function(dom) {
       var me = this;
-    //   console.log(dom.children);
+      //   console.log(dom.children);
       var a = [];
       for (let child of [...dom.children].slice(0, 1)) {
         a.push(getNodes(child));
@@ -139,8 +125,8 @@ export default {
           node.children.push({
             name: `${attr.name}="${attr.value}"`,
             type: "attribute",
-			icon: '/assets/style/img/diy/9.png',
-			drop:false
+            icon: "/assets/style/img/diy/9.png",
+            drop: false
           });
         }
         // 添加子节点
@@ -149,44 +135,44 @@ export default {
             continue;
           }
           if (child.nodeType === me.NODE_TYPE.TEXT_NODE) {
-			let nodeValue = child.nodeValue.replace(/\s*/g, "");
+            let nodeValue = child.nodeValue.replace(/\s*/g, "");
             if (nodeValue === "") {
-              	continue;
+              continue;
             }
-			node.children.push({
-				name: nodeValue,
-				type: 'text',
-				icon: '/assets/style/img/diy/8.png',
-				drop:false
-			})
+            node.children.push({
+              name: nodeValue,
+              type: "text",
+              icon: "/assets/style/img/diy/8.png",
+              drop: false
+            });
           } else {
-			  node.children.push(getNodes(child));
+            node.children.push(getNodes(child));
           }
-		}
-		node.type = 'node';
-		// node.icon = '/assets/style/img/diy/1_open.png';
+        }
+        node.type = "node";
+        // node.icon = '/assets/style/img/diy/1_open.png';
         return node;
       }
     },
     obj2Xml: function(obj) {
-		// 判断类型
-		if (obj.type === 'text') {
-			return obj.name;
-		} else if (obj.type === 'attribute') {
-			return obj.name;
-		} else {
-			let attrs = [];
-			let elements = [];
-			obj.children.forEach(child => {
-			if (child.type === 'attribute') {
-				attrs.push(this.obj2Xml(child));
-			} else {
-				elements.push(this.obj2Xml(child));
-			}
-			});
-			return `
-			<${obj.name} ${attrs.join(" ")}>${elements.join('')}</${obj.name}>`;
-		}
+      // 判断类型
+      if (obj.type === "text") {
+        return obj.name;
+      } else if (obj.type === "attribute") {
+        return obj.name;
+      } else {
+        let attrs = [];
+        let elements = [];
+        obj.children.forEach(child => {
+          if (child.type === "attribute") {
+            attrs.push(this.obj2Xml(child));
+          } else {
+            elements.push(this.obj2Xml(child));
+          }
+        });
+        return `
+			<${obj.name} ${attrs.join(" ")}>${elements.join("")}</${obj.name}>`;
+      }
     },
     commonInRenameAndRemove: function() {
       let rootNode = this.zTreeObj.getNodes()[0];
@@ -201,21 +187,21 @@ export default {
       this.commonInRenameAndRemove();
     },
     resetTId: function() {
-    //   let node = this.zTreeObj ? this.zTreeObj.getNodeByTId(this.tId) : null;
-    //   if (!node) {
-    //     this.tId = null;
-    //   }
+      //   let node = this.zTreeObj ? this.zTreeObj.getNodeByTId(this.tId) : null;
+      //   if (!node) {
+      //     this.tId = null;
+      //   }
     },
     // 点击节点后的回调
     onzTreeClick: function(event, treeId, treeNode) {
-    	this.selTreeNode = treeNode;
-		  this.tId = treeNode.tId;
+      this.selTreeNode = treeNode;
+      this.tId = treeNode.tId;
     },
     // 鼠标悬浮，显示增加节点按钮
     addHoverDom: function(treeId, treeNode) {
-		if (treeNode.type === 'text' || treeNode.type === 'attribute') {
-			return;
-		}
+      if (treeNode.type === "text" || treeNode.type === "attribute") {
+        return;
+      }
       let me = this;
       var sObj = $("#" + treeNode.tId + "_span");
       if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0)
@@ -229,8 +215,8 @@ export default {
       if (btn)
         btn.bind("click", function() {
           me.zTreeObj.addNodes(treeNode, -1, {
-        		name: "newnode",
-				type: 'node'
+            name: "newnode",
+            type: "node"
           });
           me.commonInRenameAndRemove();
           return false;
@@ -238,12 +224,13 @@ export default {
     },
     // 鼠标悬浮显示删除节点按钮
     removeHoverDom: function(treeId, treeNode) {
-		if (treeNode.type === 'text' || treeNode.type === 'attribute') {
-			return;
-		}
+      if (treeNode.type === "text" || treeNode.type === "attribute") {
+        return;
+      }
       $("#addBtn_" + treeNode.tId)
         .unbind()
         .remove();
+<<<<<<< HEAD
 	},
 	beforeDrop: function(treeId, treeNodes, targetNode, moveType) {
 		if (targetNode.type !== 'node' && moveType === 'inner') {
@@ -288,11 +275,49 @@ export default {
     });
   }
 
+=======
+    },
+    beforeDrop: function(treeId, treeNodes, targetNode, moveType) {
+      if (targetNode.type !== "node" && moveType === "inner") {
+        return false;
+      }
+    },
+    onDrop: function(event, treeId, treeNodes, targetNode, moveType) {
+      this.commonInRenameAndRemove();
+    },
+    // 保存节点属性
+    saveAttr: function(type, data) {
+      if (type === 1 || type === 2) {
+        console.log(data);
+        let node = this.tId ? this.zTreeObj.getNodeByTId(this.tId) : null;
+        if (node) {
+          node.name = data;
+          this.zTreeObj.updateNode(node);
+          this.commonInRenameAndRemove();
+        } else {
+          alert("请重新选择节点");
+          this.tId = null;
+          this.selTreeNode = null;
+        }
+      }
+      //   var attrs = [];
+      //   var trs = document.querySelectorAll(".tr-attr");
+      //   for (let tr of trs) {
+      //     attrs.push({
+      //       name: tr.querySelector(".attr-name").innerHTML,
+      //       value: tr.querySelector(".attr-value").innerHTML
+      //     });
+      //   }
+      //   this.zTreeObj.getNodeByTId(this.tId).attributes = attrs;
+      //   this.commonInRenameAndRemove();
+    }
+>>>>>>> fb355462a206fd2e3dee0889a3584bff64e17f31
   }
 };
 </script>
 
 <template>
+<<<<<<< HEAD
 	<main class="main-wrap">
     <button @click="ajax">click</button>
 		<div class="panel panel-default  ztree-wrapper">
@@ -301,67 +326,97 @@ export default {
 				<div id="ztree" class="ztree"></div>
 			</div>
 		</div>
+=======
+  <main class="main-wrap">
+    <div class="panel panel-default  ztree-wrapper">
+      <div class="panel-heading">xml结构</div>
+      <div class="panel-body ">
+        <div id="ztree" class="ztree"></div>
+      </div>
+    </div>
+>>>>>>> fb355462a206fd2e3dee0889a3584bff64e17f31
     <div class="xml-wrapper">
-      <div class="panel panel-default  edit-node">
+      <div class="panel panel-default edit-xml">
         <div class="panel-heading">xml文本</div>
         <div class="panel-body ">
           <textarea name="" class="xml-textarea" @change="format" v-model="xmlCode"></textarea>
         </div>
       </div>
-      <div class="panel panel-default  edit-node">
+      <div class="panel panel-default  node-detail">
         <div class="panel-heading">节点详情</div>
-        <div class="panel-body ">
-			  <node-show :text="selTextNode" :attribute="selAttrNode"
-			   :showType="selNodeType" @saveData="saveAttr"></node-show>
+        <div class="panel-body">
+          <node-show :text="selTextNode" :attribute="selAttrNode" :showType="selNodeType" @saveData="saveAttr"></node-show>
+        </div>
+      </div>
+      <div class="panel panel-default result-table-wrap">
+        <div class="panel-heading">查询结果</div>
+        <div class="panel-body">
+          <result-table :xml-code="xmlCode"></result-table>
         </div>
       </div>
     </div>
+<<<<<<< HEAD
 	</main>
+=======
+  </main>
+>>>>>>> fb355462a206fd2e3dee0889a3584bff64e17f31
 </template>
-<style lang="scss" scoped >
+<style lang="scss" scoped>
 .fr {
   float: right;
 }
 .tar {
   text-align: right;
 }
-.main {
-  min-height: 100vh;
-}
+
 .main-wrap {
-  height: 100%;
   overflow: hidden;
   display: flex;
+  flex-direction: row;
 }
 .ztree-wrapper {
-  flex: 1;
+  flex: 0 0 40%;
   overflow: auto;
-  height: calc(100vh - 120px);
 }
-.edit-node {
-  flex: 0 0 50%;
+.panel {
+  display: flex;
+  flex-direction: column;
+
+  .panel-body {
+    flex: 1 0 auto;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-heading {
+    flex: 0 0 auto;
+  }
 }
+
 .xml-wrapper {
   flex: 0 0 60%;
   display: flex;
   flex-direction: column;
+
+  .edit-xml {
+    flex: 1 0 auto;
+    .xml-textarea {
+      // display: block;
+      flex: 1 0 auto;
+      width: 100%;
+      height: 200px;
+      resize: vertical;
+      border: none;
+      outline: none;
+    }
+  }
+
+  .node-detail {
+    flex: 0 0 180px;
+  }
 }
-.panel {
-  margin-bottom: 0;
-}
-.panel-body {
-  height: 84%;
-  padding: 5px;
-}
-.panel-heading {
-	padding: 1px 15px;
-}
-.xml-textarea {
-  width: 100%;
-  height: calc(100% - 5px);
-  border: none;
-  resize: none;
-}
+
 .attr-table {
   width: 80%;
   .btn-save-attr {

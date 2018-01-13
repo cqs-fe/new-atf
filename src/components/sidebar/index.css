@@ -1,16 +1,18 @@
 /*sidebar navigation*/
 
 #sidebar-wrapper {
-  overflow: auto;
-  /* float: left; */
+  overflow: hidden;
+  float: left;
   z-index: 10;
-  position: fixed;
-  top: 60px;
+  height: 100%;
+  /* position: fixed; */
+  margin-top: 60px;
 }
 #sidebar {
   width: 180px;
   background: #2a3542;
-  height: calc(100vh - 110px);
+  /* height: calc(100vh - 110px); */
+  height: 100%;
   overflow: auto;
 }
 

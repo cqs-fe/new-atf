@@ -99,7 +99,7 @@ export default {
 <template>
 	<div class="wrapper">
 		<div class="col-sm-12">
-			<button class="btn btn-primary" @click="parseXml()">解析XML</button>
+			<button class="btn btn-primary" @click="parseXml()">开始解析</button>
 			<button v-if="rows.length > 0" class="btn btn-primary" @click="saveXml()">保存</button>
 		</div>
 		<div class="">
@@ -113,6 +113,14 @@ export default {
 					label="名称"
 					width="80"
 					>
+				</el-table-column>
+				<el-table-column
+					prop="chName"
+					:rows="1"
+					label="中文名">
+					<template slot-scope="scope">
+					<el-input type="textarea" v-model="scope.row.chName" placeholder="请输入内容"></el-input>
+					</template>
 				</el-table-column>
 				<el-table-column
 					prop="property"
@@ -165,16 +173,9 @@ export default {
 				</el-table-column>
 				<el-table-column
 					prop="defaultValue"
-					label="固定值">
+					label="默认值">
 					<template slot-scope="scope">
 						<el-input type="textarea" v-model="scope.row.defaultValue" placeholder="请输入内容"></el-input>
-					</template>
-				</el-table-column>
-				<el-table-column
-					prop="chName"
-					label="中文名">
-					<template slot-scope="scope">
-					<el-input type="textarea" v-model="scope.row.chName" placeholder="请输入内容"></el-input>
 					</template>
 				</el-table-column>
 			</el-table>

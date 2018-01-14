@@ -285,14 +285,14 @@ export default {
           <textarea name="" class="xml-textarea" @change="format" v-model="xmlCode"></textarea>
         </div>
       </div>
-      <div class="panel panel-default  node-detail">
+      <div class="panel panel-default node-detail">
         <div class="panel-heading">节点详情</div>
         <div class="panel-body">
           <node-show :text="selTextNode" :attribute="selAttrNode" :showType="selNodeType" @saveData="saveAttr"></node-show>
         </div>
       </div>
       <div class="panel panel-default result-table-wrap">
-        <div class="panel-heading">查询结果</div>
+        <div class="panel-heading">解析XML</div>
         <div class="panel-body">
           <result-table :xml-code="xmlCode" :interface-id="interfaceId"></result-table>
         </div>
@@ -352,7 +352,7 @@ export default {
   }
 
   .node-detail {
-    flex: 0 0 240px;
+    flex: 0 0 180px;
   }
 }
 

@@ -82,11 +82,11 @@ export default {
                 <tbody>
                     <tr><td class="td-title">属性名称</td>
                     <td class="td-content">
-                        <textarea name="" id="" v-model="attrName" class="edit-attr-name"></textarea>
+                        <textarea name="" id="" v-model="attrName" class="edit-attr-name" rows="1"></textarea>
                     </td></tr>
                     <tr><td class="td-title">属性值</td>
                     <td class="td-content">
-                        <textarea name="" id="" v-model="attrValue" class="edit-attr-value"></textarea>
+                        <textarea name="" id="" v-model="attrValue" class="edit-attr-value" rows="1"></textarea>
                     </td></tr>
                 </tbody>
             </table>
@@ -112,6 +112,9 @@ export default {
         width: 95%;
         height: 50px;
     }
+    .table {
+        margin-bottom: 5px;
+    }
     .td-title {
         width: 65px;
         padding: 2px 4px;
@@ -121,6 +124,8 @@ export default {
     }
     .btn-save-text {
         margin-right: 5%;
+        margin-top: 0px;
+        padding: 5px 10px;
     }
     .edit-attr-name, .edit-attr-value {
         width: 100%;
